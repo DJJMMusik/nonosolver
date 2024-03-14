@@ -93,10 +93,13 @@ public class Nonogram {
             NanoCell[] sourceField = source[i].getFields();
             for (int j = 0; j < target.length; j++) {
                 CellStatus sourceStatus = sourceField[j].getStatus();
-                if (sourceStatus.isUnknown() || !target[j].getFields()[i].getStatus().isUnknown()) {
-                    continue;
+                CellStatus targetStatus = target[j].getFields()[i].getStatus();
+                if (!(sourceStatus.isUnknown() || targetStatus.equals(sourceStatus))) {
+                    if ((j == 37 && i == 27)||(i == 37 && j == 27)){
+                        System.out.print("Test");
+                    }
+                    target[j].setFieldStatus(i, sourceStatus);
                 }
-                target[j].setFieldStatus(i, sourceStatus);
             }
         }
     }

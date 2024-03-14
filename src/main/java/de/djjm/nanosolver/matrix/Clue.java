@@ -53,6 +53,9 @@ public class Clue {
     public int calculatePossiblePosition(NanoCell[] cells, int direction, int startValue) {
         int border;
 
+        if (length == 4 && highestEnd == 29 && lowestStart ==23){
+            border = 1;
+        }
         if (direction == 1) {
             border = cells.length;
         } else if (direction == -1) {

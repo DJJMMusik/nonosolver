@@ -156,11 +156,11 @@ public class Main {
         );
         NanoLine frankSternfeldProblemLine = new NanoLine("I?#??###############??#####?##?I 2 16 5 3");
         NanoLine borderTestLine = new NanoLine("I   ?I 1");
-        NanoLine anotherProblemline = new NanoLine("I??????????###########################?###### I 2 27 6");
+        NanoLine anotherProblemline = new NanoLine("I   ## ????????? ?????#    ###?I 2 3 6 4");
 
         boolean calcNonogram = true;
         Nonogram nonogramToSolve = frankSternfeld;
-        boolean calcNonoline = false;
+        boolean calcNonoline = true;
         NanoLine nonolineToSolve = anotherProblemline;
         if (calcNonogram) {
             System.out.println("Nonogram");

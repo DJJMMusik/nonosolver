@@ -66,10 +66,6 @@ public class NanoLine {
         finished = false;
     }
 
-    public String toString() {
-        return "I" + Arrays.stream(fields).map(Object::toString).collect(Collectors.joining()) + "I" + lineClues.stream().map(Objects::toString).collect(Collectors.joining());
-    }
-
     public int getLength() {
         return length;
     }
@@ -138,16 +134,14 @@ public class NanoLine {
      * update the highest possible position
      */
     private void calculateHighestPositions() {
-        int lowestValue = lineClues.size() - 1;
-        int direction = - 1;
-        Clue clue = lineClues.get(lowestValue);
+        Clue clue = lineClues.get(lineClues.size() - 1);
         if (!clue.isPlaced()) {
             clue.calculateHighestPosition(null, fields);
         }
-        for (int i = lowestValue + direction; i >= 0; i += direction) {
+        for (int i = lineClues.size() - 1 -1; i >= 0; i --) {
             clue = lineClues.get(i);
             if (!clue.isPlaced()) {
-                clue.calculateHighestPosition(lineClues.get(i - direction), fields);
+                clue.calculateHighestPosition(lineClues.get(i +1), fields);
             }
         }
     }
@@ -171,7 +165,8 @@ public class NanoLine {
                 possibleClue = clue;
             }
             if (!contained) {
-                throw new IllegalStateException("In this line there are filled peaces, which are not part of a clue");
+                throw new IllegalStateException("In this line there are filled pieces, which are not part of a clue:\n" +
+                        "Nonoline: " + this);
             }
             if (possibleClue == null) {
                 continue;
@@ -182,21 +177,22 @@ public class NanoLine {
         }
         for (Clue clue : lineClues) {
             if (clue.isPlaced()) {
-                return;
+                continue;
             }
             for (int j = clue.getHighestStart(); j <= clue.getLowestEnd(); j++) {
-                if (!fields[j].getStatus().isFilled()) {
-                    try {
-                        fields[j].setRequired();
-                    } catch (Exception e) {
-                        System.out.print("An exception was thrown with the following values: \n" +
-                                "Nonoline: " + this.toString() + "\n" +
-                                "Clue: " + clue +  "\n" +
-                                "Start-Position-End" + clue.getHighestStart() + " - " + j + " - " + clue.getLowestEnd());
-                        throw e;
-                    }
-                    updated = true;
+                if (fields[j].getStatus().isFilled()) {
+                    continue;
                 }
+                try {
+                    fields[j].setRequired();
+                } catch (Exception e) {
+                    System.out.print("An exception was thrown with the following values: \n" +
+                            "Nonoline: " + this.toString() + "\n" +
+                            "Clue: " + clue +  "\n" +
+                            "Start-Position-End" + clue.getHighestStart() + " - " + j + " - " + clue.getLowestEnd());
+                    throw e;
+                }
+                updated = true;
             }
             clue.checkPlaced();
         }
@@ -246,5 +242,13 @@ public class NanoLine {
             fields[i].setRequired();
         }
         updated = true;
+    }
+
+    public String toString() {
+        if (finished) {
+            return "I" + Arrays.stream(fields).map(Object::toString).collect(Collectors.joining()) + "I" + lineClues.stream().map(Objects::toString).collect(Collectors.joining());
+        } else {
+            return "-" + Arrays.stream(fields).map(Object::toString).collect(Collectors.joining()) + "-" + lineClues.stream().map(Objects::toString).collect(Collectors.joining());
+        }
     }
 }
