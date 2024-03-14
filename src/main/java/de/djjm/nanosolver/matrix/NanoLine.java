@@ -22,8 +22,29 @@ public class NanoLine {
         finished = false;
     }
 
+    /**
+     *
+     */
+    public NanoLine(String nanoLine) {
+        String[] splittedInfo = nanoLine.split("|");
+
+        char[] cellInfo = splittedInfo[1].trim().toCharArray();
+        String[] clueInfos = splittedInfo[2].trim().split(" ");
+
+        length = cellInfo.length;
+        fields = new NanoCell[length];
+        for (int i = 0; i < cellInfo.length; i++) {
+            fields[i] = new NanoCell(cellInfo[i]);
+        }
+
+        lineClues = new ArrayList<>();
+        for (String clueInfo : clueInfos) {
+            lineClues.add(new Clue(Integer.parseInt(clueInfo), length - 1));
+        }
+    }
+
     public String toString() {
-        return "*" + Arrays.stream(fields).map(Object::toString).collect(Collectors.joining()) + "*" + lineClues.stream().map(Objects::toString).collect(Collectors.joining());
+        return "|" + Arrays.stream(fields).map(Object::toString).collect(Collectors.joining()) + "|" + lineClues.stream().map(Objects::toString).collect(Collectors.joining());
     }
 
     public int getLength() {
@@ -34,21 +55,31 @@ public class NanoLine {
         return fields;
     }
 
+    /**
+     * does one rotation of solve actions if needed
+     *
+     * @return false if there is no need to call the solveActions method, else the return value from the solveActions method.
+     */
     public boolean solveStep() {
+        // already done
         if (finished) {
             return false;
         }
+        // no changes from last run
         if (!updated) {
             return false;
         }
+        // new action run
         updated = false;
-        return solve();
+        return solveActions();
     }
 
     /**
+     * does several Actions on the line, resulting in a solve step done
+     *
      * @return true if the update logic did change the metrics
      */
-    private boolean solve() {
+    private boolean solveActions() {
         updatePossiblePositions();
         setClueFields();
         setEmptyFields();
@@ -64,6 +95,9 @@ public class NanoLine {
         calculateHighestPositions();
     }
 
+    /**
+     * updates the lowest possible position for each clue
+     */
     private void calculateLowestPositions() {
         Clue clue = lineClues.get(0);
         if (!clue.isPlaced()) {
@@ -76,6 +110,9 @@ public class NanoLine {
         }
     }
 
+    /**
+     * update the highest possible position
+     */
     private void calculateHighestPositions() {
         Clue clue = lineClues.get(lineClues.size() - 1);
         if (!clue.isPlaced()) {
@@ -144,14 +181,13 @@ public class NanoLine {
         }
     }
 
-    private boolean updateFinished() {
+    private void updateFinished() {
         for (NanoCell field : fields) {
             if (field.getStatus().isUnknown()) {
-                return false;
+                return;
             }
         }
         finished = true;
-        return true;
     }
 
 

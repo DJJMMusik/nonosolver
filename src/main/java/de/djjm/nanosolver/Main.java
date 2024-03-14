@@ -154,10 +154,13 @@ public class Main {
                 {15,3}
         }
         );
-        while (frankSternfeld.solveStep()) {
+        
+        /*while (frankSternfeld.solveStep()) {
             System.out.println(frankSternfeld);
         }
         System.out.println("----------------------------------");
-        System.out.println(frankSternfeld);
+        System.out.println(frankSternfeld);*/
+
+        new NonoLi
     }
 }

@@ -10,7 +10,7 @@ public class Nonogram {
      * Creates a Nonogram object
      *
      * @param horizontalClues The given clues as Array of the columns with each having a array of the clues from left to right
-     * @param verticalClues   The given clues as Array of the columns with each having a array of the clues from left to right
+     * @param verticalClues   The given clues as Array of the columns with each having a array of the clues from up to down
      */
     public Nonogram(Integer[][] horizontalClues, Integer[][] verticalClues) {
         int horizontalLength = horizontalClues.length;
@@ -23,6 +23,18 @@ public class Nonogram {
         for (int i = 0; i < verticalLines.length; i++) {
             verticalLines[i] = new NanoLine(horizontalLength, Arrays.asList(verticalClues[i]));
         }
+    }
+
+    /**
+     * Creates a Nonogram with prefilled information
+     * for use pls try to work with a small amount of fields
+     *
+     * @param horizontalLines The given lines as Array from left to right
+     * @param verticalLines  The given lines as Array from up to down
+     */
+    public Nonogram(NanoLine[] horizontalLines, NanoLine[] verticalLines) {
+        this.horizontalLines = horizontalLines;
+        this.verticalLines = verticalLines;
     }
 
     /**
