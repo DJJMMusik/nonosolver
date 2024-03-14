@@ -11,13 +11,24 @@ public class NanoLine {
     private boolean finished;
 
     public NanoLine(int length, List<Integer> lineClueNumbers) {
+        if (lineClueNumbers.isEmpty()) {
+            throw new IllegalArgumentException("lineClueNumbers is empty, but is required to hold at least one value." +
+                    " If the line should be empty, the List needs to be filled with a single 0");
+        }
+        if (length <= 0) {
+            throw new IllegalArgumentException("There is no NonoLine length specified." +
+                    " The length of a NonoLine has to be at least 1");
+        }
+
         this.length = length;
         fields = new NanoCell[length];
         Arrays.setAll(fields, i -> new NanoCell());
+
         lineClues = new ArrayList<>();
         for (Integer lineClueNumber : lineClueNumbers) {
             lineClues.add(new Clue(lineClueNumber, length - 1));
         }
+
         updated = true;
         finished = false;
     }
@@ -26,12 +37,21 @@ public class NanoLine {
      *
      */
     public NanoLine(String nanoLine) {
-        String[] splittedInfo = nanoLine.split("|");
+        String[] splittedInfo = nanoLine.split("I");
 
         char[] cellInfo = splittedInfo[1].trim().toCharArray();
         String[] clueInfos = splittedInfo[2].trim().split(" ");
 
+        if (clueInfos.length == 0) {
+            throw new IllegalArgumentException("There is no clue given, but at least one is required." +
+                    " If the line should be empty, a single 0 as clue is required");
+        }
+
         length = cellInfo.length;
+        if (length == 0) {
+            throw new IllegalArgumentException("There is no nonogram specified." +
+                    " If you do not want to initialize the cell informations use Nanoline(int, List<Integer)");
+        }
         fields = new NanoCell[length];
         for (int i = 0; i < cellInfo.length; i++) {
             fields[i] = new NanoCell(cellInfo[i]);
@@ -41,10 +61,13 @@ public class NanoLine {
         for (String clueInfo : clueInfos) {
             lineClues.add(new Clue(Integer.parseInt(clueInfo), length - 1));
         }
+
+        updated = true;
+        finished = false;
     }
 
     public String toString() {
-        return "|" + Arrays.stream(fields).map(Object::toString).collect(Collectors.joining()) + "|" + lineClues.stream().map(Objects::toString).collect(Collectors.joining());
+        return "I" + Arrays.stream(fields).map(Object::toString).collect(Collectors.joining()) + "I" + lineClues.stream().map(Objects::toString).collect(Collectors.joining());
     }
 
     public int getLength() {
@@ -127,12 +150,12 @@ public class NanoLine {
 
     private void setClueFields() {
         for (int i = 0; i < fields.length; i++) {
-            if(!fields[i].getStatus().isFilled()){
+            if (!fields[i].getStatus().isFilled()) {
                 continue;
             }
             Clue possibleClue = null;
             for (Clue clue : lineClues) {
-                if (!clue.canContain(i)){
+                if (!clue.canContain(i)) {
                     continue;
                 }
                 if (possibleClue != null) {
@@ -144,7 +167,7 @@ public class NanoLine {
             if (possibleClue == null) {
                 continue;
             }
-            if(possibleClue.needsToContainCell(i)){
+            if (possibleClue.needsToContainCell(i)) {
                 updated = true;
             }
         }

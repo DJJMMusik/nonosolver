@@ -1,6 +1,9 @@
 package de.djjm.nanosolver.matrix;
 
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 public class Clue {
     private final int length;
     private boolean placed;
@@ -29,28 +32,35 @@ public class Clue {
     }
 
     public void calculateLowestPosition(Clue lowerClue, NanoCell[] fields) {
+        int dir = 1;
         //setting lowestStart to the lowest possible position
         if (lowerClue != null) {
             //setting the lowestStart to the first possible position in reference to the lower clue
-            lowestStart = Math.max(lowerClue.getLowestEnd() + 2, lowestStart);//2 because one higher and one empty space between clues
+            lowestStart = Math.max(lowerClue.getLowestEnd() + dir*2, lowestStart);//2 because one higher and one empty space between clues
         }
-        CellStatus previousStatus = getStatus(lowestStart-1, fields);
+        CellStatus previousStatus = getStatus(lowestStart + dir, fields);
         int currentLength = 0;
-        for (int i = lowestStart; i < fields.length; i++) {
+        int border = fields.length;
+        for (int i = lowestStart; i < border; i += dir) {
             CellStatus status = fields[i].getStatus();
+            if (previousStatus.isFilled()) {
+                previousStatus = status;
+                lowestStart = i + dir;
+            }
             if (currentLength == length) {
                 //having reached length goal
-                if (!(status == CellStatus.FILLED || previousStatus == CellStatus.FILLED)) {
+                if (!(status.isFilled())) {
                     return;
                 }
-                previousStatus = fields[lowestStart].getStatus();
-                lowestStart++;
+                previousStatus = fields[lowestStart].getStatus(); // previusStatus = fields[i+1].getStatus
+                lowestStart++; //lowestStart = i + 2 * dir
+                //i++
                 continue;
             }
             if (status == CellStatus.EMPTY) {
                 //not enough space until now, so reset
                 currentLength = 0;
-                lowestStart++;
+                lowestStart = i + 1;
             } else {
                 //still space so continue
                 currentLength++;
@@ -70,9 +80,14 @@ public class Clue {
         int currentLength = 0;
         for (int i = highestEnd; i >= 0; i--) {
             CellStatus status = fields[i].getStatus();
+            if (previousStatus.isFilled()) {
+                previousStatus = status;
+                i--;
+                lowestStart = i;
+            }
             if (currentLength == length) {
                 //having reached length goal
-                if (!(status == CellStatus.FILLED || previousStatus == CellStatus.FILLED)) {
+                if (!(status.isFilled())) {
                     return;
                 }
                 previousStatus = fields[highestEnd].getStatus();
@@ -82,14 +97,16 @@ public class Clue {
             if (status == CellStatus.EMPTY) {
                 //not enough space until now, so reset
                 currentLength = 0;
-                highestEnd--;
+                highestEnd = i - 1;
             } else {
                 //still space so continue
                 currentLength++;
             }
         }
         if (currentLength != length) {
-            throw new ArrayIndexOutOfBoundsException();
+            throw new ArrayIndexOutOfBoundsException("Failed while calculation the highest position: \n" +
+                    "I" + Arrays.stream(fields).map(Object::toString).collect(Collectors.joining()) + "I\n" +
+                    "Clue information: " + length + " " + lowestStart + "-" + highestEnd);
         }
     }
 
@@ -98,7 +115,7 @@ public class Clue {
         int lowestStartOld = lowestStart;
         highestEnd = Math.min(highestEnd, i + length - 1);
         lowestStart = Math.max(lowestStart, i - length + 1);
-        return !(highestEndOld== highestEnd && lowestStartOld == lowestStart);
+        return !(highestEndOld == highestEnd && lowestStartOld == lowestStart);
     }
 
     public boolean canContain(int i) {
