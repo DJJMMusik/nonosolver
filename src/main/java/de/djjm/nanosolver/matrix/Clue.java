@@ -32,82 +32,77 @@ public class Clue {
     }
 
     public void calculateLowestPosition(Clue lowerClue, NanoCell[] fields) {
-        int dir = 1;
+        final int GO_UP = 1;
         //setting lowestStart to the lowest possible position
         if (lowerClue != null) {
             //setting the lowestStart to the first possible position in reference to the lower clue
-            lowestStart = Math.max(lowerClue.getLowestEnd() + dir*2, lowestStart);//2 because one higher and one empty space between clues
+            lowestStart = Math.max(lowerClue.getLowestEnd() + 2, lowestStart);//2 because one higher and one empty space between clues
         }
-        CellStatus previousStatus = getStatus(lowestStart + dir, fields);
-        int currentLength = 0;
-        int border = fields.length;
-        for (int i = lowestStart; i < border; i += dir) {
-            CellStatus status = fields[i].getStatus();
-            if (previousStatus.isFilled()) {
-                previousStatus = status;
-                lowestStart = i + dir;
-            }
-            if (currentLength == length) {
-                //having reached length goal
-                if (!(status.isFilled())) {
-                    return;
-                }
-                previousStatus = fields[lowestStart].getStatus(); // previusStatus = fields[i+1].getStatus
-                lowestStart++; //lowestStart = i + 2 * dir
-                //i++
-                continue;
-            }
-            if (status == CellStatus.EMPTY) {
-                //not enough space until now, so reset
-                currentLength = 0;
-                lowestStart = i + 1;
-            } else {
-                //still space so continue
-                currentLength++;
-            }
-        }
-        if (currentLength != length) {
-            throw new ArrayIndexOutOfBoundsException();
-        }
+        lowestStart = calculatePossiblePosition(fields, GO_UP, lowestStart);
     }
 
     public void calculateHighestPosition(Clue higherClue, NanoCell[] fields) {
+        final int GO_DOWN = -1;
         //setting lowestStart to the lowest possible position
         if (higherClue != null) {
             highestEnd = Math.min(higherClue.getHighestStart() - 2, highestEnd); //2 because one lower and one empty space between clues
         }
-        CellStatus previousStatus = getStatus(highestEnd + 1, fields);
+        highestEnd = calculatePossiblePosition(fields, GO_DOWN, highestEnd);
+    }
+
+    public int calculatePossiblePosition(NanoCell[] cells, int direction, int startValue) {
+        int border;
+
+        if (direction == 1) {
+            border = cells.length;
+        } else if (direction == -1) {
+            border = 1;
+        } else {
+            throw new IllegalArgumentException("The direction parameter can just hold the values 1 or -1 but is: " + direction);
+        }
+
+        int calculatedValue = startValue;
+        CellStatus previousStatus = getStatus(calculatedValue - direction, cells);
         int currentLength = 0;
-        for (int i = highestEnd; i >= 0; i--) {
-            CellStatus status = fields[i].getStatus();
+
+        for (int checkPosition = calculatedValue; checkPosition * direction < border; checkPosition += direction) {
+            CellStatus status = cells[checkPosition].getStatus();
             if (previousStatus.isFilled()) {
+                // start not possible, because the position next to it is already used
                 previousStatus = status;
-                i--;
-                lowestStart = i;
+                calculatedValue += direction;
+                continue;
             }
             if (currentLength == length) {
                 //having reached length goal
                 if (!(status.isFilled())) {
-                    return;
+                    // found possible position
+                    return calculatedValue;
                 }
-                previousStatus = fields[highestEnd].getStatus();
-                highestEnd--;
+
+                previousStatus = cells[calculatedValue].getStatus();
+                calculatedValue += direction;
                 continue;
             }
             if (status == CellStatus.EMPTY) {
                 //not enough space until now, so reset
                 currentLength = 0;
-                highestEnd = i - 1;
-            } else {
-                //still space so continue
-                currentLength++;
+                previousStatus = status;
+                calculatedValue = checkPosition + direction;
+                continue;
             }
+            //still space so continue
+            currentLength++;
         }
         if (currentLength != length) {
-            throw new ArrayIndexOutOfBoundsException("Failed while calculation the highest position: \n" +
-                    "I" + Arrays.stream(fields).map(Object::toString).collect(Collectors.joining()) + "I\n" +
+            throw new ArrayIndexOutOfBoundsException("Failed while calculation the possible position: \n" +
+                    "Direction: " + direction + "\n" +
+                    "Start value: " + startValue + "\n" +
+                    "Border value: " + border + "\n" +
+                    "I" + Arrays.stream(cells).map(Object::toString).collect(Collectors.joining()) + "I\n" +
                     "Clue information: " + length + " " + lowestStart + "-" + highestEnd);
         }
+        return calculatedValue;
     }
 
     public boolean needsToContainCell(int i) {

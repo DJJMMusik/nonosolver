@@ -128,8 +128,9 @@ public class NanoLine {
         }
         for (int i = 1; i < lineClues.size(); i++) {
             clue = lineClues.get(i);
-            if (clue.isPlaced()) continue;
-            clue.calculateLowestPosition(lineClues.get(i - 1), fields);
+            if (!clue.isPlaced()) {
+                clue.calculateLowestPosition(lineClues.get(i - 1), fields);
+            }
         }
     }
 
@@ -137,14 +138,17 @@ public class NanoLine {
      * update the highest possible position
      */
     private void calculateHighestPositions() {
-        Clue clue = lineClues.get(lineClues.size() - 1);
+        int lowestValue = lineClues.size() - 1;
+        int direction = - 1;
+        Clue clue = lineClues.get(lowestValue);
         if (!clue.isPlaced()) {
             clue.calculateHighestPosition(null, fields);
         }
-        for (int i = lineClues.size() - 2; i >= 0; i--) {
+        for (int i = lowestValue + direction; i >= 0; i += direction) {
             clue = lineClues.get(i);
-            if (clue.isPlaced()) continue;
-            clue.calculateHighestPosition(lineClues.get(i + 1), fields);
+            if (!clue.isPlaced()) {
+                clue.calculateHighestPosition(lineClues.get(i - direction), fields);
+            }
         }
     }
 
@@ -153,6 +157,7 @@ public class NanoLine {
             if (!fields[i].getStatus().isFilled()) {
                 continue;
             }
+            boolean contained = false;
             Clue possibleClue = null;
             for (Clue clue : lineClues) {
                 if (!clue.canContain(i)) {
@@ -162,7 +167,11 @@ public class NanoLine {
                     possibleClue = null;
                     break;
                 }
+                contained = true;
                 possibleClue = clue;
+            }
+            if (!contained) {
+                throw new IllegalStateException("In this line there are filled peaces, which are not part of a clue");
             }
             if (possibleClue == null) {
                 continue;
@@ -177,7 +186,15 @@ public class NanoLine {
             }
             for (int j = clue.getHighestStart(); j <= clue.getLowestEnd(); j++) {
                 if (!fields[j].getStatus().isFilled()) {
-                    fields[j].setRequired();
+                    try {
+                        fields[j].setRequired();
+                    } catch (Exception e) {
+                        System.out.print("An exception was thrown with the following values: \n" +
+                                "Nonoline: " + this.toString() + "\n" +
+                                "Clue: " + clue +  "\n" +
+                                "Start-Position-End" + clue.getHighestStart() + " - " + j + " - " + clue.getLowestEnd());
+                        throw e;
+                    }
                     updated = true;
                 }
             }

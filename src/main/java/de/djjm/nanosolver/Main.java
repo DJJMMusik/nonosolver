@@ -154,26 +154,31 @@ public class Main {
                 {15, 3}
         }
         );
+        NanoLine frankSternfeldProblemLine = new NanoLine("I?#??###############??#####?##?I 2 16 5 3");
+        NanoLine borderTestLine = new NanoLine("I   ?I 1");
+        NanoLine anotherProblemline = new NanoLine("I??????????###########################?###### I 2 27 6");
+
         boolean calcNonogram = true;
+        Nonogram nonogramToSolve = frankSternfeld;
         boolean calcNonoline = false;
+        NanoLine nonolineToSolve = anotherProblemline;
         if (calcNonogram) {
             System.out.println("Nonogram");
-            while (frankSternfeld.solveStep()) {
-                System.out.println(frankSternfeld);
+            while (nonogramToSolve.solveStep()) {
+                System.out.println(nonogramToSolve); //Problem in 9th iteration
             }
             System.out.println("----------------------------------");
-            System.out.println(frankSternfeld);
+            System.out.println(nonogramToSolve);
         }
 
         if (calcNonoline) {
             System.out.println("NonoLine");
-            NanoLine frankSternfeldProblemLine = new NanoLine("I?#####?? #### ??  ?? ####???? I 6 4 2 7");
-            System.out.println(frankSternfeldProblemLine);
-            while (frankSternfeldProblemLine.solveStep()) {
-                System.out.println(frankSternfeldProblemLine);
+            System.out.println(nonolineToSolve);
+            while (nonolineToSolve.solveStep()) {
+                System.out.println(nonolineToSolve);
             }
             System.out.println("----------------------------------");
-            System.out.println(frankSternfeldProblemLine);
+            System.out.println(nonolineToSolve);
         }
     }
 }
