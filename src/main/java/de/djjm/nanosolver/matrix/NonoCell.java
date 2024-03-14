@@ -1,23 +1,23 @@
 package de.djjm.nanosolver.matrix;
 
-public class NanoCell {
-    public static final char symbolUnknown = '?';
-    public static final char symbolFilled = '#';
-    public static final char symbolEmpty = ' ';
+public class NonoCell {
+    public static final char SYMBOL_UNKNOWN = '?';
+    public static final char SYMBOL_FILLED = '#';
+    public static final char SYMBOL_EMPTY = ' ';
 
     private CellStatus status;
 
-    public NanoCell() {
+    public NonoCell() {
         status = CellStatus.UNKNOWN;
     }
 
-    public NanoCell(char status) {
-        switch (status) {
-            case symbolUnknown -> this.status = CellStatus.UNKNOWN;
-            case symbolEmpty -> this.status = CellStatus.EMPTY;
-            case symbolFilled -> this.status = CellStatus.FILLED;
-            default -> new IllegalStateException("Could not parse " + status + " into a CellStatus");
-        }
+    public NonoCell(char status) {
+        this.status = switch (status) {
+            case SYMBOL_UNKNOWN -> CellStatus.UNKNOWN;
+            case SYMBOL_EMPTY -> CellStatus.EMPTY;
+            case SYMBOL_FILLED -> CellStatus.FILLED;
+            default -> throw new IllegalStateException("Could not parse " + status + " into a CellStatus");
+        };
     }
 
     /**
@@ -47,9 +47,9 @@ public class NanoCell {
     @Override
     public String toString() {
         return switch (status) {
-            case UNKNOWN -> String.valueOf(symbolUnknown);
-            case FILLED -> String.valueOf(symbolFilled);
-            case EMPTY -> String.valueOf(symbolEmpty);
+            case UNKNOWN -> String.valueOf(SYMBOL_UNKNOWN);
+            case FILLED -> String.valueOf(SYMBOL_FILLED);
+            case EMPTY -> String.valueOf(SYMBOL_EMPTY);
         };
     }
 }

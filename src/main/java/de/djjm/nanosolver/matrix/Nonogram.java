@@ -3,25 +3,25 @@ package de.djjm.nanosolver.matrix;
 import java.util.Arrays;
 
 public class Nonogram {
-    private final NanoLine[] horizontalLines;
-    private final NanoLine[] verticalLines;
+    private final NonoLine[] horizontalLines;
+    private final NonoLine[] verticalLines;
 
     /**
      * Creates a Nonogram object
      *
-     * @param horizontalClues The given clues as Array of the columns with each having a array of the clues from left to right
-     * @param verticalClues   The given clues as Array of the columns with each having a array of the clues from up to down
+     * @param horizontalClues The given clues as Array of the columns with each having an array of the clues from left to right
+     * @param verticalClues   The given clues as Array of the columns with each having an array of the clues from up to down
      */
     public Nonogram(Integer[][] horizontalClues, Integer[][] verticalClues) {
         int horizontalLength = horizontalClues.length;
         int verticalLength = verticalClues.length;
-        horizontalLines = new NanoLine[horizontalLength];
+        horizontalLines = new NonoLine[horizontalLength];
         for (int i = 0; i < horizontalLines.length; i++) {
-            horizontalLines[i] = new NanoLine(verticalLength, Arrays.asList(horizontalClues[i]));
+            horizontalLines[i] = new NonoLine(verticalLength, Arrays.asList(horizontalClues[i]));
         }
-        verticalLines = new NanoLine[verticalLength];
+        verticalLines = new NonoLine[verticalLength];
         for (int i = 0; i < verticalLines.length; i++) {
-            verticalLines[i] = new NanoLine(horizontalLength, Arrays.asList(verticalClues[i]));
+            verticalLines[i] = new NonoLine(horizontalLength, Arrays.asList(verticalClues[i]));
         }
     }
 
@@ -32,7 +32,7 @@ public class Nonogram {
      * @param horizontalLines The given lines as Array from left to right
      * @param verticalLines  The given lines as Array from up to down
      */
-    public Nonogram(NanoLine[] horizontalLines, NanoLine[] verticalLines) {
+    public Nonogram(NonoLine[] horizontalLines, NonoLine[] verticalLines) {
         this.horizontalLines = horizontalLines;
         this.verticalLines = verticalLines;
     }
@@ -59,9 +59,9 @@ public class Nonogram {
      * @param lines the lines to be solved
      * @return true if something changed else false
      */
-    private boolean solveStep(NanoLine[] lines) {
+    private boolean solveStep(NonoLine[] lines) {
         boolean stepworked = false;
-        for (NanoLine line : lines) {
+        for (NonoLine line : lines) {
             if (line.isFinished()) {
                 continue;
             }
@@ -88,16 +88,13 @@ public class Nonogram {
      * @param source the Matrix being used as source
      * @param target the Matrix which is synchronized
      */
-    private void syncDirection(NanoLine[] source, NanoLine[] target) {
+    private void syncDirection(NonoLine[] source, NonoLine[] target) {
         for (int i = 0; i < source.length; i++) {
-            NanoCell[] sourceField = source[i].getFields();
+            NonoCell[] sourceField = source[i].getCells();
             for (int j = 0; j < target.length; j++) {
                 CellStatus sourceStatus = sourceField[j].getStatus();
-                CellStatus targetStatus = target[j].getFields()[i].getStatus();
+                CellStatus targetStatus = target[j].getCells()[i].getStatus();
                 if (!(sourceStatus.isUnknown() || targetStatus.equals(sourceStatus))) {
-                    if ((j == 37 && i == 27)||(i == 37 && j == 27)){
-                        System.out.print("Test");
-                    }
                     target[j].setFieldStatus(i, sourceStatus);
                 }
             }
