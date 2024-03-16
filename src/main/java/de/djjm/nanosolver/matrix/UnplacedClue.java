@@ -18,11 +18,6 @@ public class UnplacedClue implements Clue {
         highestEnd = maxPosition;
     }
 
-    @Override
-    public boolean isNotPlaced() {
-        return true;
-    }
-
     public Clue checkPlaced() {
         if (length == highestEnd - lowestStart + 1) return new PlacedClue(length, highestEnd, lowestStart);
         return this;
@@ -70,17 +65,6 @@ public class UnplacedClue implements Clue {
         return iteratorPos - (length * direction);
     }
 
-    private void checkIfFits(int currentLength, NonoCell[] cells, int direction, int startValue, int border) {
-        if (currentLength != length) {
-            throw new ArrayIndexOutOfBoundsException("Failed while calculation the possible position: \n" +
-                    "Direction: " + direction + "\n" +
-                    "Start value: " + startValue + "\n" +
-                    "Border value: " + border + "\n" +
-                    "I" + Arrays.stream(cells).map(Object::toString).collect(Collectors.joining()) + "I\n" +
-                    "Clue information: " + length + " " + lowestStart + "-" + highestEnd);
-        }
-    }
-
     private static int generateBorder(int length, int direction) {
         return switch (direction) {
             case 1 -> length;
@@ -100,14 +84,6 @@ public class UnplacedClue implements Clue {
 
     public boolean canContain(int i) {
         return i <= highestEnd && i >= lowestStart;
-    }
-
-    private CellStatus getStatus(int i, NonoCell[] fields) {
-        if ((i == -1) || (i == fields.length)) {
-            return CellStatus.EMPTY;
-        } else {
-            return fields[i].getStatus();
-        }
     }
 
     public int getHighestStart() {

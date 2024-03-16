@@ -7,8 +7,6 @@ public interface Clue {
         return new UnplacedClue(length, maxPosition);
     }
 
-    boolean isNotPlaced();
-
     Clue checkPlaced();
 
     default void calculateLowestPosition(Clue lowerClue, NonoCell[] cells){}

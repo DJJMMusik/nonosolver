@@ -142,9 +142,8 @@ public class NonoLine {
      */
     private void calculateHighestPositions() {
         Clue previousClue = null;
-        Clue clue = lineClues.get(lineClues.size() - 1);
         for (int i = lineClues.size() - 1; i >= 0; i--) {
-            clue = lineClues.get(i);
+            Clue clue = lineClues.get(i);
             clue.calculateHighestPosition(previousClue, cells);
             previousClue = clue;
         }

@@ -17,10 +17,6 @@ public class PlacedClue implements Clue {
         this.start = lowestStart;
     }
 
-    public boolean isNotPlaced() {
-        return false;
-    }
-
     public Clue checkPlaced() {
         return this;
     }
