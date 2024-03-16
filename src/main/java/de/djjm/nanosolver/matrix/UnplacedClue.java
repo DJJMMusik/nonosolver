@@ -24,7 +24,7 @@ public class UnplacedClue implements Clue {
     }
 
     public Clue checkPlaced() {
-        if(length == highestEnd - lowestStart + 1) return new PlacedClue(length,highestEnd,lowestStart);
+        if (length == highestEnd - lowestStart + 1) return new PlacedClue(length, highestEnd, lowestStart);
         return this;
     }
 
@@ -35,7 +35,7 @@ public class UnplacedClue implements Clue {
             //setting the lowestStart to the first possible position in reference to the lower clue
             lowestStart = Math.max(lowerClue.getLowestEnd() + NEEDED_DISTANCE, lowestStart);//2 because one higher and one empty space between clues
         }
-        lowestStart = calculatePossiblePosition(fields, GO_UP, lowestStart);
+        lowestStart = calculatePossiblePositionDuplicated(fields, GO_UP, lowestStart);
     }
 
     @Override
@@ -44,11 +44,11 @@ public class UnplacedClue implements Clue {
         if (higherClue != null) {
             highestEnd = Math.min(higherClue.getHighestStart() - NEEDED_DISTANCE, highestEnd); //2 because one lower and one empty space between clues
         }
-        highestEnd = calculatePossiblePosition(fields, GO_DOWN, highestEnd);
+        highestEnd = calculatePossiblePositionDuplicated(fields, GO_DOWN, highestEnd);
     }
 
     private int calculatePossiblePosition(NonoCell[] cells, int direction, int startValue) {
-        int border = borderFromDirection(cells.length, direction);
+        int border = generateBorder(cells.length, direction);
         int calculatedValue = startValue;
         CellStatus previousStatus = getStatus(calculatedValue - direction, cells);
         int currentLength = 0;
@@ -86,6 +86,29 @@ public class UnplacedClue implements Clue {
         return calculatedValue;
     }
 
+    private int calculatePossiblePositionDuplicated(NonoCell[] cells, int direction, int startValue) {
+        int border = generateBorder(cells.length, direction);
+
+        CellStatusList statusList = new CellStatusList();
+
+        boolean positionFound = false;
+        int iteratorPos;
+
+        for (iteratorPos = startValue; iteratorPos * direction < border && !positionFound; iteratorPos+=direction) {
+            positionFound = cells[iteratorPos].processStatus(statusList, length);
+            if (positionFound) iteratorPos-=direction;
+        }
+        if (!statusList.isLength(length)) {
+            throw new ArrayIndexOutOfBoundsException("Failed while calculation the possible position: \n" +
+                    "Direction: " + direction + "\n" +
+                    "Start value: " + startValue + "\n" +
+                    "Border value: " + border + "\n" +
+                    "I" + Arrays.stream(cells).map(Object::toString).collect(Collectors.joining()) + "I\n" +
+                    "Clue information: " + length + " " + lowestStart + "-" + highestEnd);
+        }
+        return iteratorPos - (length * direction);
+    }
+
     private void checkIfFits(int currentLength, NonoCell[] cells, int direction, int startValue, int border) {
         if (currentLength != length) {
             throw new ArrayIndexOutOfBoundsException("Failed while calculation the possible position: \n" +
@@ -97,7 +120,7 @@ public class UnplacedClue implements Clue {
         }
     }
 
-    private static int borderFromDirection(int length, int direction) {
+    private static int generateBorder(int length, int direction) {
         return switch (direction) {
             case 1 -> length;
             case -1 -> 1;

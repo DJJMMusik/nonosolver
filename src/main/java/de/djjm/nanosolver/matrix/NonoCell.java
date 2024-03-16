@@ -52,4 +52,13 @@ public class NonoCell {
             case EMPTY -> String.valueOf(SYMBOL_EMPTY);
         };
     }
+
+    public boolean processStatus(CellStatusList statusList, int length) {
+        return switch (status) {
+            case UNKNOWN -> statusList.processStatusUnknown(length, status);
+            case FILLED -> statusList.processStatusFilled(length, status);
+            case EMPTY -> statusList.processStatusEmpty(length);
+        };
+    }
+
 }

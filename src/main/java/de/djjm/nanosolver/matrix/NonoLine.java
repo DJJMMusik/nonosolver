@@ -141,15 +141,12 @@ public class NonoLine {
      * update the highest possible position
      */
     private void calculateHighestPositions() {
+        Clue previousClue = null;
         Clue clue = lineClues.get(lineClues.size() - 1);
-        if (clue.isNotPlaced()) {
-            clue.calculateHighestPosition(null, cells);
-        }
-        for (int i = lineClues.size() - 1 - 1; i >= 0; i--) {
+        for (int i = lineClues.size() - 1; i >= 0; i--) {
             clue = lineClues.get(i);
-            if (clue.isNotPlaced()) {
-                clue.calculateHighestPosition(lineClues.get(i + 1), cells);
-            }
+            clue.calculateHighestPosition(previousClue, cells);
+            previousClue = clue;
         }
     }
 

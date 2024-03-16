@@ -152,13 +152,14 @@ public class Main {
             }
         );
         NonoLine frankSternfeldProblemLine = new NonoLine("I?#??###############??#####?##?I 2 16 5 3");
+        NonoLine line = new NonoLine("I????????##??????##?#?#???  # ?#?  #####    ?#I 2 4 2 3 1 2 5 1");
         NonoLine borderTestLine = new NonoLine("I   ?I 1");
         NonoLine anotherProblemline = new NonoLine("I   ## ????????? ?????#    ###?I 2 3 6 4");
 
         boolean calcNonogram = true;
         Nonogram nonogramToSolve = frankSternfeld;
-        boolean calcNonoline = true;
-        NonoLine nonolineToSolve = anotherProblemline;
+        boolean calcNonoline = false;
+        NonoLine nonolineToSolve = line;
         if (calcNonogram) {
             System.out.println("Nonogram");
             while (nonogramToSolve.solveStep()) {
