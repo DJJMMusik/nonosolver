@@ -35,7 +35,7 @@ public class UnplacedClue implements Clue {
             //setting the lowestStart to the first possible position in reference to the lower clue
             lowestStart = Math.max(lowerClue.getLowestEnd() + NEEDED_DISTANCE, lowestStart);//2 because one higher and one empty space between clues
         }
-        lowestStart = calculatePossiblePositionDuplicated(fields, GO_UP, lowestStart);
+        lowestStart = calculatePossiblePosition(fields, GO_UP, lowestStart);
     }
 
     @Override
@@ -44,49 +44,10 @@ public class UnplacedClue implements Clue {
         if (higherClue != null) {
             highestEnd = Math.min(higherClue.getHighestStart() - NEEDED_DISTANCE, highestEnd); //2 because one lower and one empty space between clues
         }
-        highestEnd = calculatePossiblePositionDuplicated(fields, GO_DOWN, highestEnd);
+        highestEnd = calculatePossiblePosition(fields, GO_DOWN, highestEnd);
     }
 
     private int calculatePossiblePosition(NonoCell[] cells, int direction, int startValue) {
-        int border = generateBorder(cells.length, direction);
-        int calculatedValue = startValue;
-        CellStatus previousStatus = getStatus(calculatedValue - direction, cells);
-        int currentLength = 0;
-
-        for (int checkPosition = calculatedValue; checkPosition * direction < border; checkPosition += direction) {
-            CellStatus status = cells[checkPosition].getStatus();
-            if (previousStatus.isFilled()) {
-                // start not possible, because the position next to it is already used
-                previousStatus = status;
-                calculatedValue += direction;
-                continue;
-            }
-            if (currentLength == length) {
-                //having reached length goal
-                if (!(status.isFilled())) {
-                    // found possible position
-                    return calculatedValue;
-                }
-
-                previousStatus = cells[calculatedValue].getStatus();
-                calculatedValue += direction;
-                continue;
-            }
-            if (status == CellStatus.EMPTY) {
-                //not enough space until now, so reset
-                currentLength = 0;
-                previousStatus = status;
-                calculatedValue = checkPosition + direction;
-                continue;
-            }
-            //still space so continue
-            currentLength++;
-        }
-        checkIfFits(currentLength, cells, direction, startValue, border);
-        return calculatedValue;
-    }
-
-    private int calculatePossiblePositionDuplicated(NonoCell[] cells, int direction, int startValue) {
         int border = generateBorder(cells.length, direction);
 
         CellStatusList statusList = new CellStatusList();
@@ -94,9 +55,9 @@ public class UnplacedClue implements Clue {
         boolean positionFound = false;
         int iteratorPos;
 
-        for (iteratorPos = startValue; iteratorPos * direction < border && !positionFound; iteratorPos+=direction) {
+        for (iteratorPos = startValue; iteratorPos * direction < border && !positionFound; iteratorPos += direction) {
             positionFound = cells[iteratorPos].processStatus(statusList, length);
-            if (positionFound) iteratorPos-=direction;
+            if (positionFound) iteratorPos -= direction;
         }
         if (!statusList.isLength(length)) {
             throw new ArrayIndexOutOfBoundsException("Failed while calculation the possible position: \n" +
