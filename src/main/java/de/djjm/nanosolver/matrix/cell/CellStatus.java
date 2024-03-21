@@ -1,4 +1,4 @@
-package de.djjm.nanosolver.matrix;
+package de.djjm.nanosolver.matrix.cell;
 
 public enum CellStatus {
     UNKNOWN, FILLED, EMPTY;

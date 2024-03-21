@@ -1,5 +1,8 @@
 package de.djjm.nanosolver.matrix;
 
+import de.djjm.nanosolver.matrix.cell.CellStatus;
+import de.djjm.nanosolver.matrix.cell.NonoCell;
+
 import java.util.Arrays;
 
 public class Nonogram {
@@ -95,7 +98,7 @@ public class Nonogram {
                 CellStatus sourceStatus = sourceField[j].getStatus();
                 CellStatus targetStatus = target[j].getCells()[i].getStatus();
                 if (!(sourceStatus.isUnknown() || targetStatus.equals(sourceStatus))) {
-                    target[j].setFieldStatus(i, sourceStatus);
+                    target[j].setCellStatus(i, sourceStatus);
                 }
             }
         }

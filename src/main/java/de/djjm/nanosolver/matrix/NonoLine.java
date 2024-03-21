@@ -1,5 +1,9 @@
 package de.djjm.nanosolver.matrix;
 
+import de.djjm.nanosolver.matrix.cell.CellStatus;
+import de.djjm.nanosolver.matrix.cell.NonoCell;
+import de.djjm.nanosolver.matrix.clue.Clue;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -92,12 +96,7 @@ public class NonoLine {
      * @return false if there is no need to call the solveActions method, else the return value from the solveActions method.
      */
     public boolean solveStep() {
-        // already done
-        if (finished) {
-            return false;
-        }
-        // no changes from last run
-        if (!updated) {
+        if (finished || !updated) {
             return false;
         }
         // new action run
@@ -154,33 +153,41 @@ public class NonoLine {
             if (!cells[i].getStatus().isFilled()) {
                 continue;
             }
-            boolean contained = false;
-            Clue possibleClue = null;
-            for (Clue clue : lineClues) {
-                if (!clue.canContain(i)) {
-                    continue;
-                }
-                if (possibleClue != null) {
-                    possibleClue = null;
-                    break;
-                }
-                contained = true;
-                possibleClue = clue;
-            }
-            if (!contained) {
-                throw new IllegalStateException("In this line there are filled pieces, which are not part of a clue:\n" +
-                        "Nonoline: " + this);
-            }
-            if (possibleClue == null) {
+            checkCellsForRequiredClues(i);
+        }
+        checkCluesForRequiredCells();
+    }
+
+    private void checkCellsForRequiredClues(int i) {
+        boolean contained = false;
+        Clue possibleClue = null;
+        for (Clue clue : lineClues) {
+            if (!clue.canContain(i)) {
                 continue;
             }
-            if (possibleClue.needsToContainCell(i)) {
-                updated = true;
+            if (possibleClue != null) {
+                possibleClue = null;
+                break;
             }
+            contained = true;
+            possibleClue = clue;
         }
+        if (!contained) {
+            throw new IllegalStateException("In this line there are filled pieces, which are not part of a clue:\n" +
+                    "Nonoline: " + this);
+        }
+        if (possibleClue == null) {
+            return;
+        }
+        if (possibleClue.needsToContainCell(i)) {
+            updated = true;
+        }
+    }
+
+    private void checkCluesForRequiredCells() {
         for (int i = 0; i < lineClues.size(); i++) {
             Clue clue = lineClues.get(i);
-            if (clue.fillKnownRequiredCells(cells)) updated = true;
+            if (clue.fillRequiredCells(cells)) updated = true;
             if (updated) {
                 lineClues.set(i, clue.checkPlaced());
             }
@@ -221,17 +228,8 @@ public class NonoLine {
         return finished;
     }
 
-    public void setFieldStatus(int i, CellStatus status) {
-        CellStatus oldStatus = cells[i].getStatus();
-        if (!oldStatus.isUnknown()) {
-            throw new IllegalStateException("The state of the NanoField is already set to " + oldStatus);
-        }
-        if (status.isEmpty()) {
-            cells[i].setUnreachable();
-        } else if (status.isFilled()) {
-            cells[i].setRequired();
-        }
-        updated = true;
+    public void setCellStatus(int i, CellStatus status) {
+        if (cells[i].setCellStatus(status)) updated = true;
     }
 
     public String toString() {

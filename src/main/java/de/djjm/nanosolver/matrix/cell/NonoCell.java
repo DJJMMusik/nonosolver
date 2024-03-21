@@ -1,9 +1,9 @@
-package de.djjm.nanosolver.matrix;
+package de.djjm.nanosolver.matrix.cell;
 
 public class NonoCell {
-    public static final char SYMBOL_UNKNOWN = '?';
-    public static final char SYMBOL_FILLED = '#';
-    public static final char SYMBOL_EMPTY = ' ';
+    private static final char SYMBOL_UNKNOWN = '?';
+    private static final char SYMBOL_FILLED = '#';
+    private static final char SYMBOL_EMPTY = ' ';
 
     private CellStatus status;
 
@@ -24,7 +24,7 @@ public class NonoCell {
      * set the status to empty if the status was unknown
      */
     public void setUnreachable() {
-        if (!status.isUnknown()) {
+        if (status.isFilled()) {
             throw new IllegalStateException("The state of the NanoField is already set to " + status);
         }
         status = CellStatus.EMPTY;
@@ -34,7 +34,7 @@ public class NonoCell {
      * set the status to filled if the status was unknown
      */
     public void setRequired() {
-        if (!status.isUnknown()) {
+        if (status.isEmpty()) {
             throw new IllegalStateException("The state of the NanoField is already set to " + status);
         }
         status = CellStatus.FILLED;
@@ -61,4 +61,14 @@ public class NonoCell {
         };
     }
 
+    public boolean setCellStatus(CellStatus status) {
+        if (status.isEmpty()) {
+            setUnreachable();
+            return true;
+        } else if (status.isFilled()) {
+            setRequired();
+            return true;
+        }
+        return false;
+    }
 }

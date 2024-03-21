@@ -1,4 +1,6 @@
-package de.djjm.nanosolver.matrix;
+package de.djjm.nanosolver.matrix.clue;
+
+import de.djjm.nanosolver.matrix.cell.NonoCell;
 
 public class PlacedClue implements Clue {
     private final int length;
@@ -22,8 +24,8 @@ public class PlacedClue implements Clue {
     }
 
     public boolean needsToContainCell(int i) {
-        return ((i >= start) && (i <= end));
-    }
+        return i <= end && i >= start;
+    } // TODO duplicate from canContain
 
     public boolean canContain(int i) {
         return i <= end && i >= start;
@@ -41,7 +43,7 @@ public class PlacedClue implements Clue {
         return start;
     }
 
-    public boolean fillKnownRequiredCells(NonoCell[] cells) {
+    public boolean fillRequiredCells(NonoCell[] cells) {
         return false;
     }
 }

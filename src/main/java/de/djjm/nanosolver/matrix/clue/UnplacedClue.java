@@ -1,5 +1,8 @@
-package de.djjm.nanosolver.matrix;
+package de.djjm.nanosolver.matrix.clue;
 
+
+import de.djjm.nanosolver.matrix.cell.CellStatusList;
+import de.djjm.nanosolver.matrix.cell.NonoCell;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -19,7 +22,9 @@ public class UnplacedClue implements Clue {
     }
 
     public Clue checkPlaced() {
-        if (length == highestEnd - lowestStart + 1) return new PlacedClue(length, highestEnd, lowestStart);
+        if (length == highestEnd - lowestStart + 1) {
+            return new PlacedClue(length, highestEnd, lowestStart);
+        }
         return this;
     }
 
@@ -99,12 +104,9 @@ public class UnplacedClue implements Clue {
         return " " + length;
     }
 
-    public boolean fillKnownRequiredCells(NonoCell[] cells) {
+    public boolean fillRequiredCells(NonoCell[] cells) {
         boolean change = false;
         for (int j = highestEnd - length + 1; j <= lowestStart + length - 1; j++) {
-            if (cells[j].getStatus().isFilled()) {
-                continue;
-            }
             try {
                 cells[j].setRequired();
             } catch (Exception e) {

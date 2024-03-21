@@ -1,4 +1,6 @@
-package de.djjm.nanosolver.matrix;
+package de.djjm.nanosolver.matrix.clue;
+
+import de.djjm.nanosolver.matrix.cell.NonoCell;
 
 public interface Clue {
 
@@ -24,5 +26,5 @@ public interface Clue {
 
     int getHighestStart();
 
-    boolean fillKnownRequiredCells(NonoCell[] cells);
+    boolean fillRequiredCells(NonoCell[] cells);
 }
